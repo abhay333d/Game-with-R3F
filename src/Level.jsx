@@ -236,7 +236,11 @@ function Bounds({ length = 1 }) {
   );
 }
 
-const Level = ({ count = 5, types = [BlockLimbo, BlockAxe, BlockSpinner] }) => {
+const Level = ({
+  count = 5,
+  types = [BlockLimbo, BlockAxe, BlockSpinner],
+  seed = 0,
+}) => {
   const blocks = useMemo(() => {
     const blocks = [];
 
@@ -246,7 +250,7 @@ const Level = ({ count = 5, types = [BlockLimbo, BlockAxe, BlockSpinner] }) => {
     }
 
     return blocks;
-  }, [count, types]);
+  }, [count, types, seed]);
 
   return (
     <>

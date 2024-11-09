@@ -3,11 +3,17 @@ import { useFrame } from "@react-three/fiber";
 import { RigidBody, useRapier } from "@react-three/rapier";
 import React, { useEffect, useRef, useState } from "react";
 import * as THREE from "three";
+import useGame from "./store/useGame";
 
 const Player = () => {
   const [subscribeKeys, getKeys] = useKeyboardControls();
   const body = useRef();
   const { rapier, world } = useRapier();
+
+  const start = useGame((state) => state.start);
+  const restart = useGame((state) => state.restart);
+  const end = useGame((state) => state.end);
+  const blocksCount = useGame((state) => state.blocksCount);
 
   const [smoothedCameraPosition] = useState(
     () => new THREE.Vector3(10, 10, 10)
@@ -22,12 +28,27 @@ const Player = () => {
 
     const hit = world.castRay(ray, 10, true);
 
-    if (hit.timeOfImpact < 0.15) {
+    if (hit.timeOfImpact < 0.1) {
       body.current.applyImpulse({ x: 0, y: 0.5, z: 0 });
     }
   };
 
+  const reset = () => {
+    body.current.setTranslation({ x: 0, y: 1, z: 0 });
+    body.current.setLinvel({ x: 0, y: 0, z: 0 });
+    body.current.setAngvel({ x: 0, y: 0, z: 0 });
+  };
+
   useEffect(() => {
+    const unsubscribeReset = useGame.subscribe(
+      (state) => state.phase,
+      (phase) => {
+        if (phase === "ready") {
+          reset();
+        }
+      }
+    );
+
     const uncubscribeJump = subscribeKeys(
       (state) => state.jump,
       (value) => {
@@ -37,8 +58,12 @@ const Player = () => {
       }
     );
 
+    const unsubscribeAny = subscribeKeys(() => start());
+
     return () => {
       uncubscribeJump();
+      unsubscribeAny();
+      unsubscribeReset();
     };
   }, []);
 
@@ -99,6 +124,17 @@ const Player = () => {
 
       state.camera.position.copy(smoothedCameraPosition);
       state.camera.lookAt(smoothedCameraTarget);
+
+      /**
+       * Phases
+       */
+      if (bodyPosition.z < -(blocksCount * 4 + 2)) {
+        end();
+      }
+
+      if (bodyPosition.y < -4) {
+        restart();
+      }
     }
   });
 
