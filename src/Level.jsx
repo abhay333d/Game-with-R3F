@@ -1,4 +1,4 @@
-import { useGLTF } from "@react-three/drei";
+import { Text, Float, useGLTF } from "@react-three/drei";
 import { useFrame } from "@react-three/fiber";
 import { CuboidCollider, RigidBody } from "@react-three/rapier";
 import React, { useMemo, useRef, useState } from "react";
@@ -14,6 +14,20 @@ function BlockStart({ position = [0, 0, 0] }) {
   return (
     <>
       <group position={position}>
+        <Float floatIntensity={0.25} rotationIntensity={0.25} speed={5}>
+          <Text
+            scale={0.5}
+            font="./bebas-neue-v9-latin-regular.woff"
+            maxWidth={0.25}
+            lineHeight={0.75}
+            textAlign="right"
+            position={[0.75, 0.65, 0]}
+            rotation-y={-0.25}
+          >
+            Marble Race
+            <meshBasicMaterial toneMapped={false} />
+          </Text>
+        </Float>
         <mesh
           geometry={boxGeometry}
           scale={[4, 0.2, 4]}
@@ -33,6 +47,14 @@ function BlockEnd({ position = [0, 0, 0] }) {
   return (
     <>
       <group position={position}>
+        <Text
+          font="./bebas-neue-v9-latin-regular.woff"
+          scale={1}
+          position={[0, 2.25, 2]}
+        >
+          Finish
+          <meshBasicMaterial toneMapped={false} />
+        </Text>
         <mesh
           geometry={boxGeometry}
           scale={[4, 0.2, 4]}
